@@ -1,4 +1,38 @@
+@use "variables" as *;
+
 * {
   padding: 0;
   margin: 0;
+}
+
+body {
+  padding: 1rem;
+  min-height: 100vh;
+  background-color: aquamarine;
+  color: #fff;
+  font-family: $font-text;
+}
+
+.current-weather {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin-top: 2rem;
+  align-items: center;
+  text-shadow: 1px 1px 5px #000;
+
+  &__city {
+    font-size: 1.5rem;
+    font-weight: 400;
+  }
+
+  &__current-temperature {
+    font-size: 4.5rem;
+    font-weight: 200;
+    margin: 0.5rem 0;
+  }
+
+  &__current-condition {
+    margin-bottom: 0.25rem;
+  }
 }
