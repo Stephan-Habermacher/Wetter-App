@@ -1,4 +1,7 @@
 @use "variables" as *;
+@use "sass:color";
+@import "mixins";
+@import "currentWeather";
 
 * {
   padding: 0;
@@ -6,33 +9,29 @@
 }
 
 body {
-  padding: 1rem;
-  min-height: 100vh;
-  background-color: aquamarine;
-  color: #fff;
-  font-family: $font-text;
+  @include largeScreens {
+    background-color: gray;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background-color: color.adjust($background, $lightness: 10%);
+  }
 }
 
-.current-weather {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  margin-top: 2rem;
-  align-items: center;
-  text-shadow: 1px 1px 5px #000;
+#app {
+  background: linear-gradient(0deg, $elevation-2 0%, $background 50%);
+  color: $text-color;
+  padding: 1rem;
+  min-height: 100vh;
+  font-family: $font-familiy;
 
-  &__city {
-    font-size: 1.5rem;
-    font-weight: 400;
-  }
-
-  &__current-temperature {
-    font-size: 4.5rem;
-    font-weight: 200;
-    margin: 0.5rem 0;
-  }
-
-  &__current-condition {
-    margin-bottom: 0.25rem;
+  @include largeScreens {
+    width: 400px;
+    height: 900px;
+    min-height: unset;
+    overflow: auto;
+    border-radius: $border-radius;
+    box-shadow: $box-shadow;
   }
 }
