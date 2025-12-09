@@ -8,6 +8,15 @@ export async function fetchCurrentWeather(city) {
 
   const data = await res.json();
 
-  console.log(data);
+  return data;
+}
+
+export async function fetchForecastWeather(city) {
+  const res = await fetch(
+    `${API_ENDPOINT}/forecast.json?key=${API_KEY}&q=${city}&lang=de`
+  );
+
+  const data = await res.json();
+
   return data;
 }

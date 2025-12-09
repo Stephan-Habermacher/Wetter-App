@@ -1,3 +1,5 @@
+@use "variables" as *;
+
 .current-weather {
   display: flex;
   flex-direction: column;

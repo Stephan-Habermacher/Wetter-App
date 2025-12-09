@@ -1,7 +1,7 @@
 @use "variables" as *;
 @use "sass:color";
-@import "mixins";
-@import "currentWeather";
+@use "mixins" as *;
+@use "currentWeather" as *;
 
 * {
   padding: 0;

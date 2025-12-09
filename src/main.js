@@ -1,4 +1,4 @@
 import "../styles/main.scss";
-import { fetchCurrentWeather } from "./fetching";
+import { renderCurrentWeather } from "./currentWeather";
 
-fetchCurrentWeather("Luzern");
+renderCurrentWeather("Luzern");
