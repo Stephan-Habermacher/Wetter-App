@@ -8,7 +8,11 @@ export async function fetchCurrentWeather(city) {
 
   const data = await res.json();
 
-  return data;
+  return {
+    city: data.location.name,
+    temp: Math.round(data.current.temp_c),
+    condition: data.current.condition.text,
+  };
 }
 
 export async function fetchForecastWeather(city) {
@@ -18,5 +22,8 @@ export async function fetchForecastWeather(city) {
 
   const data = await res.json();
 
-  return data;
+  return {
+    max: Math.round(data.forecast.forecastday[0].day.maxtemp_c),
+    min: Math.round(data.forecast.forecastday[0].day.mintemp_c),
+  };
 }

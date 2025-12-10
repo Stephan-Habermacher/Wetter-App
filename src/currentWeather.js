@@ -4,8 +4,15 @@ export async function renderCurrentWeather(city) {
   const app = document.getElementById("app");
   // HTML erstellen
   app.innerHTML = `
-  <div class="current-weather">
-    <div class="current-weather__loading-spinner"></div>
+  <div class="loading-spinner">
+        <div class="loading-spinner__message">Lade Wetterdaten für ${city}...</div>
+        <div class="lds-ripple">
+          <div></div>
+          <div></div>
+        </div>
+      </div>
+
+  <div class="current-weather current-weather--active">
     <h2 class="current-weather__city"></h2>
     <h1 class="current-weather__current-temperature"></h1>
     <p class="current-weather__current-condition"></p>
@@ -16,6 +23,8 @@ export async function renderCurrentWeather(city) {
   </div>`;
 
   // HTML Elemente selektieren
+  const loadingSpinner = app.querySelector(".loading-spinner");
+  const currentWeather = app.querySelector(".current-weather");
   const cityEl = app.querySelector(".current-weather__city");
   const tempEl = app.querySelector(".current-weather__current-temperature");
   const conditionEl = app.querySelector(".current-weather__current-condition");
@@ -25,13 +34,13 @@ export async function renderCurrentWeather(city) {
   // Fetchen und HTML Elemente befüllen
   const current = await fetchCurrentWeather(city);
   const forecast = await fetchForecastWeather(city);
-  console.log(current, forecast);
 
-  cityEl.textContent = current.location.name;
-  tempEl.textContent = current.current.temp_c + "°";
-  conditionEl.textContent = current.current.condition.text;
-  maxTempEl.textContent =
-    "H: " + forecast.forecast.forecastday[0].day.maxtemp_c + "°";
-  minTempEl.textContent =
-    "T: " + forecast.forecast.forecastday[0].day.mintemp_c + "°";
+  cityEl.textContent = current.city;
+  tempEl.textContent = current.temp + "°";
+  conditionEl.textContent = current.condition;
+  maxTempEl.textContent = `H: ${forecast.max}°`;
+  minTempEl.textContent = `T: ${forecast.min}°`;
+
+  loadingSpinner.classList.add("hidden");
+  currentWeather.classList.add("active");
 }

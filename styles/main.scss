@@ -2,6 +2,7 @@
 @use "sass:color";
 @use "mixins" as *;
 @use "currentWeather" as *;
+@use "loadingSpinner" as *;
 
 * {
   padding: 0;
@@ -28,7 +29,7 @@ body {
 
   @include largeScreens {
     width: 400px;
-    height: 900px;
+    height: $max-height-desktop;
     min-height: unset;
     overflow: auto;
     border-radius: $border-radius;
