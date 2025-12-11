@@ -1,5 +1,5 @@
 const API_KEY = import.meta.env.VITE_WEATHER_API_KEY;
-const API_ENDPOINT = "http://api.weatherapi.com/v1";
+const API_ENDPOINT = "https://api.weatherapi.com/v1";
 
 export async function fetchCurrentWeather(city) {
   const res = await fetch(
