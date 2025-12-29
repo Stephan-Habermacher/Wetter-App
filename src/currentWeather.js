@@ -27,8 +27,9 @@ export async function renderCurrentWeather(city) {
         }</span>
       </div>
   </div>`;
-  } catch (error) {}
-  hideLoadingSpinner(app);
-  app.innerHTML = `<p>Fehler beim Laden der Wetterdaten.</p>`;
-  console.error(error);
+  } catch (error) {
+    hideLoadingSpinner(app);
+    app.innerHTML = `<p>Fehler beim Laden der Wetterdaten.</p>`;
+    console.error(error);
+  }
 }
