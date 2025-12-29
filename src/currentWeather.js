@@ -1,12 +1,19 @@
 import { fetchCurrentWeather, fetchForecastWeather } from "./fetching";
+import { hideLoadingSpinner, showLoadingSpinner } from "./loadingSpinner";
 
 export async function renderCurrentWeather(city) {
-  const current = await fetchCurrentWeather(city);
-  const forecast = await fetchForecastWeather(city);
-
   const app = document.getElementById("app");
+  app.innerHTML = "";
 
-  app.innerHTML = `
+  showLoadingSpinner(app, `Lade Wetterdaten für ${city}...`);
+
+  try {
+    const current = await fetchCurrentWeather(city);
+    const forecast = await fetchForecastWeather(city);
+
+    hideLoadingSpinner(app);
+
+    app.innerHTML = `
   <div class="current-weather current-weather--active">
     <h2 class="current-weather__city">${current.city}</h2>
     <h1 class="current-weather__current-temperature">${current.temp + "°"}</h1>
@@ -20,10 +27,8 @@ export async function renderCurrentWeather(city) {
         }</span>
       </div>
   </div>`;
-
-  const loadingSpinner = app.querySelector(".loading-spinner");
-  const currentWeather = app.querySelector(".current-weather");
-
-  loadingSpinner.classList.add("hidden");
-  currentWeather.classList.add("active");
+  } catch (error) {}
+  hideLoadingSpinner(app);
+  app.innerHTML = `<p>Fehler beim Laden der Wetterdaten.</p>`;
+  console.error(error);
 }
