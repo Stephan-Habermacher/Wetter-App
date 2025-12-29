@@ -5,16 +5,8 @@ export async function renderCurrentWeather(city) {
   const forecast = await fetchForecastWeather(city);
 
   const app = document.getElementById("app");
-  // HTML erstellen
-  app.innerHTML = `
-  <div class="loading-spinner">
-        <div class="loading-spinner__message">Lade Wetterdaten für ${city}...</div>
-        <div class="lds-ripple">
-          <div></div>
-          <div></div>
-        </div>
-      </div>
 
+  app.innerHTML = `
   <div class="current-weather current-weather--active">
     <h2 class="current-weather__city">${current.city}</h2>
     <h1 class="current-weather__current-temperature">${current.temp + "°"}</h1>
@@ -29,11 +21,8 @@ export async function renderCurrentWeather(city) {
       </div>
   </div>`;
 
-  // HTML Elemente selektieren
   const loadingSpinner = app.querySelector(".loading-spinner");
   const currentWeather = app.querySelector(".current-weather");
-
-  // Fetchen und HTML Elemente befüllen
 
   loadingSpinner.classList.add("hidden");
   currentWeather.classList.add("active");
