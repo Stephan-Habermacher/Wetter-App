@@ -1,5 +1,6 @@
 import { fetchCurrentWeather, fetchForecastWeather } from "./fetching";
 import { hideLoadingSpinner, showLoadingSpinner } from "./loadingSpinner";
+import { getTodayForecast } from "./todayForecast";
 
 export async function renderCurrentWeather(city) {
   const app = document.getElementById("app");
@@ -26,7 +27,10 @@ export async function renderCurrentWeather(city) {
           "T: " + forecast.min + "°"
         }</span>
       </div>
-  </div>`;
+  </div>
+  
+  ${getTodayForecast(forecast)}
+  `;
   } catch (error) {
     hideLoadingSpinner(app);
     app.innerHTML = `<p>Fehler beim Laden der Wetterdaten.</p>`;
