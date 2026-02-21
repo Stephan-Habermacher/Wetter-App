@@ -17,23 +17,38 @@ export async function fetchCurrentWeather(city) {
 
 export async function fetchForecastWeather(city) {
   const res = await fetch(
-    `${API_ENDPOINT}/forecast.json?key=${API_KEY}&q=${city}&lang=de`,
+    `${API_ENDPOINT}/forecast.json?key=${API_KEY}&q=${city}&days=2&lang=de`,
   );
 
   const data = await res.json();
 
-  const day = data.forecast.forecastday[0];
+  console.log(data);
+
+  const today = data.forecast.forecastday[0];
+  const tomorrow = data.forecast.forecastday[1];
+
+  const now = new Date();
+  const currentHour = now.getHours();
+
+  const remainingToday = today.hour.slice(currentHour);
+
+  const missingHours = 24 - remainingToday.length;
+
+  const fromTomorrow = tomorrow.hour.slice(0, missingHours);
+
+  const next24HoursRaw = [...remainingToday, ...fromTomorrow];
+
+  const next24Hours = next24HoursRaw.map((hour, index) => ({
+    time: index === 0 ? "Jetzt" : hour.time.split(" ")[1].slice(0, 2) + " Uhr",
+    temp: Math.round(hour.temp_c),
+    icon: "https:" + hour.condition.icon,
+  }));
 
   return {
-    max: Math.round(day.day.maxtemp_c),
-    min: Math.round(day.day.mintemp_c),
-    condition: day.day.condition.text,
-    wind: day.day.maxwind_kph,
-
-    hours: day.hour.map((hour) => ({
-      time: hour.time.split(" ")[1].slice(0, 2),
-      temp: hour.temp_c,
-      icon: "https:" + hour.condition.icon,
-    })),
+    max: Math.round(today.day.maxtemp_c),
+    min: Math.round(today.day.mintemp_c),
+    condition: today.day.condition.text,
+    wind: today.day.maxwind_kph,
+    hours: next24Hours,
   };
 }

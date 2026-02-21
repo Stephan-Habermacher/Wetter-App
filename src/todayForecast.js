@@ -10,7 +10,7 @@ export function getTodayForecast(forecast) {
           .map(
             (hour) => `
               <div class="hourly-forecast">
-                <div class="hourly-forecast__time">${hour.time} Uhr</div>
+                <div class="hourly-forecast__time">${hour.time}</div>
                 <img
                   src="${hour.icon}"
                   alt=""
