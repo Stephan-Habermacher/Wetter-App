@@ -4,6 +4,7 @@
 @use "currentWeather" as *;
 @use "loadingSpinner" as *;
 @use "todayForecast" as *;
+@use "nextDaysForecast" as *;
 
 * {
   padding: 0;
