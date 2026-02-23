@@ -1,12 +1,12 @@
-export function getTodayForecast(forecast) {
+export function dayForecast(weather) {
   return `
     <div class="today-forecast">
       <div class="today-forecast__conditions">
-        Heute ${forecast.condition}. Wind bis zu ${forecast.wind} km/h.
+        Heute ${weather.condition}. Wind bis zu ${weather.wind} km/h.
       </div>
 
       <div class="today-forecast__hours">
-        ${forecast.hours
+        ${weather.hours
           .map(
             (hour) => `
               <div class="hourly-forecast">

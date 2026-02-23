@@ -1,0 +1,100 @@
+@use "variables" as *;
+@use "mixins" as *;
+
+.current-weather {
+  display: none;
+
+  &--active {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-top: 2rem;
+    text-shadow: $text-shadow;
+  }
+
+  &__city {
+    font-size: 1.5rem;
+    font-weight: 400;
+  }
+
+  &__current-temperature {
+    font-size: 4.5rem;
+    font-weight: 200;
+    margin: 0.5rem 0;
+  }
+
+  &__current-condition {
+    margin-bottom: 0.25rem;
+  }
+}
+
+.loading-spinner.hidden {
+  display: none;
+}
+
+.today-forecast {
+  margin-top: 2rem;
+  @include card();
+
+  &__conditions {
+    @include cardHeader();
+  }
+
+  &__hours {
+    width: 100%;
+    display: flex;
+    overflow-x: scroll;
+    gap: 0.5rem;
+  }
+
+  .hourly-forecast {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+
+    &__icon {
+      width: 4rem;
+    }
+  }
+}
+
+.forecast {
+  @include card();
+  margin-top: 2rem;
+
+  &__title {
+    @include cardHeader();
+  }
+
+  &__days {
+    display: flex;
+    flex-direction: column;
+    gap: $card-header-gap;
+    width: 100%;
+  }
+}
+
+.forecast-day {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding-bottom: $card-header-gap;
+  border-bottom: $border;
+
+  &:last-child {
+    padding: 0;
+    border: none;
+  }
+
+  &__day {
+    width: 2rem;
+  }
+
+  &__icon {
+    width: 2.5rem;
+  }
+}

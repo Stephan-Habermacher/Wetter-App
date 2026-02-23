@@ -1,4 +1,4 @@
 import "../styles/main.scss";
-import { renderCurrentWeather } from "./currentWeather";
+import { renderDetailView } from "./detailView";
 
-renderCurrentWeather("Luzern");
+renderDetailView("Sursee");

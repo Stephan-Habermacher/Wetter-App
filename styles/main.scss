@@ -1,10 +1,8 @@
 @use "variables" as *;
 @use "sass:color";
 @use "mixins" as *;
-@use "currentWeather" as *;
+@use "detailView" as *;
 @use "loadingSpinner" as *;
-@use "todayForecast" as *;
-@use "nextDaysForecast" as *;
 
 * {
   padding: 0;
