@@ -1,4 +1,4 @@
-export function dayForecast(weather) {
+export function getDayForecast(weather) {
   return `
     <div class="today-forecast">
       <div class="today-forecast__conditions">

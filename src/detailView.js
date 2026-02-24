@@ -1,7 +1,8 @@
 import { getWeatherData } from "./api";
 import { hideLoadingSpinner, showLoadingSpinner } from "./loadingSpinner";
-import { dayForecast } from "./dayForecast";
-import { daysForecast } from "./daysForecast";
+import { getDayForecast } from "./dayForecast";
+import { getDaysForecast } from "./daysForecast";
+import { getMiniStats } from "./miniStats";
 
 export async function renderDetailView(city) {
   const app = document.getElementById("app");
@@ -25,8 +26,9 @@ export async function renderDetailView(city) {
       </div>
   </div>
   
-  ${dayForecast(weather)}
-  ${daysForecast(weather.days)}
+  ${getDayForecast(weather)}
+  ${getDaysForecast(weather.days)}
+  ${getMiniStats(weather)}
   `;
   } catch (error) {
     hideLoadingSpinner(app);

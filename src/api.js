@@ -1,3 +1,5 @@
+import { formatTime } from "./utils";
+
 const API_KEY = import.meta.env.VITE_WEATHER_API_KEY;
 const API_ENDPOINT = "https://api.weatherapi.com/v1";
 
@@ -11,6 +13,7 @@ export async function getWeatherData(city) {
   }
 
   const data = await res.json();
+  console.log(data);
 
   // Stundenvorhersage für die nächsten 24 Stunden
   const today = data.forecast.forecastday[0];
@@ -59,5 +62,13 @@ export async function getWeatherData(city) {
 
     hours,
     days: forecastDays,
+
+    humidity: data.current.humidity,
+    feelsLike: data.current.feelslike_c,
+    precipitation: data.current.precip_mm,
+    uv: data.current.uv,
+
+    sunrise: formatTime(today.astro.sunrise),
+    sunset: formatTime(today.astro.sunset),
   };
 }

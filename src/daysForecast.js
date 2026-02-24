@@ -1,4 +1,4 @@
-export function daysForecast(days) {
+export function getDaysForecast(days) {
   return `
     <div class="forecast">
       <div class="forecast__title">Vorhersage für die nächsten 3 Tage:</div>
