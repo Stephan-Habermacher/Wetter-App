@@ -8,6 +8,7 @@ import { getConditionImagePath } from "./conditions";
 export async function renderDetailView(city) {
   const app = document.getElementById("app");
   app.innerHTML = "";
+  app.classList.remove("show-background");
 
   showLoadingSpinner(app, `Lade Wetterdaten für ${city}...`);
 
@@ -15,13 +16,7 @@ export async function renderDetailView(city) {
     const weather = await getWeatherData(city);
     hideLoadingSpinner(app);
 
-    const conditionImage = getConditionImagePath(
-      weather.conditionCode,
-      !weather.isDay,
-    );
-
     app.innerHTML = `
-      <div class="show-background">
         <div class="current-weather current-weather--active">
           <h2 class="current-weather__city">${weather.city}</h2>
           <h1 class="current-weather__current-temperature">${weather.currentTemp}°</h1>
@@ -35,10 +30,20 @@ export async function renderDetailView(city) {
         ${getDayForecast(weather)}
         ${getDaysForecast(weather.days)}
         ${getMiniStats(weather)}
-      </div>
   `;
-    const showBackground = document.querySelector(".show-background");
-    showBackground.style.backgroundImage = `--detail-condition-image: url(${conditionImage})`;
+
+    const conditionImage = getConditionImagePath(
+      weather.conditionCode,
+      !weather.isDay,
+    );
+
+    if (conditionImage) {
+      app.style.setProperty(
+        "--detail-condition-image",
+        `url(${conditionImage})`,
+      );
+      app.classList.add("show-background");
+    }
   } catch (error) {
     hideLoadingSpinner(app);
     app.innerHTML = `<p>Fehler beim Laden der Wetterdaten.</p>`;
