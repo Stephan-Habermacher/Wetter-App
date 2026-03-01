@@ -54,6 +54,8 @@ export async function getWeatherData(city) {
 
     currentTemp: Math.round(data.current.temp_c),
     currentCondition: data.current.condition.text,
+    conditionCode: data.current.condition.code,
+    isDay: data.current.is_day === 1,
 
     max: Math.round(today.day.maxtemp_c),
     min: Math.round(today.day.mintemp_c),

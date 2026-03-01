@@ -8,7 +8,7 @@ export function getMiniStats(weather) {
     </div>
 
     <div class="mini-stat">
-      <div class="mini-stat__heading">Gefühlte Temperatur</div>
+      <div class="mini-stat__heading">Gefühlt</div>
       <div class="mini-stat__value">${weather.feelsLike}°</div>
     </div>
 
@@ -24,7 +24,7 @@ export function getMiniStats(weather) {
 
     <div class="mini-stat">
       <div class="mini-stat__heading">Niederschlag</div>
-      <div class="mini-stat__value">${weather.precipitation}mm</div>
+      <div class="mini-stat__value">${weather.precipitation} mm</div>
     </div>
 
     <div class="mini-stat">
