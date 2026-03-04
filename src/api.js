@@ -51,6 +51,7 @@ export async function getWeatherData(city) {
 
   return {
     city: data.location.name,
+    country: data.location.country,
 
     currentTemp: Math.round(data.current.temp_c),
     currentCondition: data.current.condition.text,
