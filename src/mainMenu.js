@@ -3,13 +3,23 @@ import { getConditionImagePath } from "./conditions";
 import { renderDetailView } from "./detailView";
 import { hideLoadingSpinner, showLoadingSpinner } from "./loadingSpinner";
 
-export async function renderMainMenu(cities) {
+let isEditMode = false;
+
+const deleteIcon = `
+<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+  <path stroke-linecap="round" stroke-linejoin="round" d="M15 12H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+</svg>
+`;
+
+export async function renderMainMenu() {
   const app = document.getElementById("app");
 
   app.classList.remove("show-background");
   app.innerHTML = "";
 
   showLoadingSpinner(app, "Lade Übersicht...");
+
+  const cities = JSON.parse(localStorage.getItem("cities")) || [];
 
   app.innerHTML = `
    <div class="main-menu">
@@ -25,11 +35,32 @@ export async function renderMainMenu(cities) {
         />
       </div>
 
+      <div class="main-menu__message"></div>
+
       <div class="main-menu__cities-list"></div>
     </div>
   `;
 
-  const citiesList = document.querySelector(".main-menu__cities-list");
+  const citiesList = app.querySelector(".main-menu__cities-list");
+  const message = app.querySelector(".main-menu__message");
+  const editButton = app.querySelector(".main-menu__edit");
+
+  editButton.addEventListener("click", () => {
+    isEditMode = !isEditMode;
+    editButton.textContent = isEditMode ? "Fertig" : "Bearbeiten";
+
+    const deleteButtons = app.querySelectorAll(".city-wrapper__delete");
+
+    deleteButtons.forEach((btn) => {
+      btn.classList.toggle("city-wrapper__delete--show", isEditMode);
+    });
+  });
+
+  if (cities.length === 0) {
+    message.textContent = "Noch keine Favoriten gespeichert.";
+    hideLoadingSpinner(app);
+    return;
+  }
 
   for (const city of cities) {
     try {
@@ -54,6 +85,8 @@ function createCityCard(weather) {
   );
 
   wrapper.innerHTML = `
+    <div class="city-wrapper__delete" data-city-name="${weather.city}">${deleteIcon}</div>
+
     <div class="city" style="--condition-image: url(${conditionImage})">
       <div class="city__left-column">
         <h2 class="city__name">${weather.city}</h2>
@@ -71,9 +104,30 @@ function createCityCard(weather) {
   `;
 
   const cityElement = wrapper.querySelector(".city");
+  const deleteButton = wrapper.querySelector(".city-wrapper__delete");
 
   cityElement.addEventListener("click", () => {
-    renderDetailView(weather.city);
+    if (!isEditMode) {
+      renderDetailView(weather.city);
+    }
+  });
+
+  deleteButton.addEventListener("click", (e) => {
+    e.stopPropagation();
+
+    const cityName = deleteButton.dataset.cityName;
+    const cities = JSON.parse(localStorage.getItem("cities")) || [];
+
+    const updatedCities = cities.filter((c) => c !== cityName);
+
+    localStorage.setItem("cities", JSON.stringify(updatedCities));
+
+    if (updatedCities.length === 0) {
+      renderMainMenu();
+      return;
+    }
+
+    wrapper.remove();
   });
 
   return wrapper;

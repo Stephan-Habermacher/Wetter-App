@@ -16,6 +16,17 @@
     text-shadow: $text-shadow;
   }
 
+  &__edit {
+    background-color: transparent;
+    border: none;
+    color: $text-color;
+    font-size: 1rem;
+    font-weight: 700;
+    text-shadow: $text-shadow;
+    cursor: pointer;
+    margin-top: 0.5rem;
+  }
+
   &__search-bar {
     width: 100%;
   }
@@ -36,6 +47,24 @@
   }
 }
 
+.city-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+
+  &__delete {
+    display: none;
+    width: 2rem;
+    filter: drop-shadow($text-shadow);
+    color: rgb(241, 60, 60);
+    cursor: pointer;
+
+    &--show {
+      display: block;
+    }
+  }
+}
+
 .city {
   @include card();
   display: grid;
@@ -48,6 +77,7 @@
   background-size: cover;
   background-position: 50% 25%;
   text-shadow: $text-shadow;
+  flex-grow: 1;
 
   &__name {
     font-weight: 400;
