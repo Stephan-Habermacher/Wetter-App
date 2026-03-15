@@ -75,3 +75,16 @@ export async function getWeatherData(city) {
     sunset: formatTime(today.astro.sunset),
   };
 }
+
+export async function searchCity(city) {
+  const res = await fetch(
+    `${API_ENDPOINT}/search.json?key=${API_KEY}&q=${city}&lang=de`,
+  );
+
+  if (!res.ok) {
+    throw new Error("Search API Fehler");
+  }
+
+  const data = await res.json();
+  return data;
+}

@@ -1,4 +1,4 @@
-import { getWeatherData } from "./api";
+import { getWeatherData, searchCity } from "./api";
 import { getConditionImagePath } from "./conditions";
 import { renderDetailView } from "./detailView";
 import { hideLoadingSpinner, showLoadingSpinner } from "./loadingSpinner";
@@ -11,39 +11,93 @@ const deleteIcon = `
 </svg>
 `;
 
+function debounce(callback, delay = 300) {
+  let timeout;
+
+  return (...args) => {
+    clearTimeout(timeout);
+
+    timeout = setTimeout(() => {
+      callback(...args);
+    }, delay);
+  };
+}
+
 export async function renderMainMenu() {
   const app = document.getElementById("app");
 
   app.classList.remove("show-background");
   app.innerHTML = "";
 
-  showLoadingSpinner(app, "Lade Übersicht...");
-
   const cities = JSON.parse(localStorage.getItem("cities")) || [];
 
   app.innerHTML = `
-   <div class="main-menu">
-      <div class="main-menu__heading">
-        Wetter <button class="main-menu__edit">Bearbeiten</button>
+    <div class="main-menu">
+        <div class="main-menu__heading">
+          Wetter <button class="main-menu__edit">Bearbeiten</button>
       </div>
-
+      
       <div class="main-menu__search-bar">
         <input
           type="text"
           class="main-menu__search-input"
           placeholder="Nach Stadt suchen..."
         />
+        <div class="main-menu__search-results"></div>
       </div>
-
+    
       <div class="main-menu__message"></div>
-
+    
       <div class="main-menu__cities-list"></div>
-    </div>
+  </div>
   `;
+
+  showLoadingSpinner(app, "Lade Übersicht...");
 
   const citiesList = app.querySelector(".main-menu__cities-list");
   const message = app.querySelector(".main-menu__message");
   const editButton = app.querySelector(".main-menu__edit");
+  const searchInput = app.querySelector(".main-menu__search-input");
+  const searchResults = app.querySelector(".main-menu__search-results");
+
+  const handleSearch = debounce(async (value) => {
+    const query = value.trim();
+
+    if (query.length < 2) {
+      searchResults.innerHTML = "";
+      return;
+    }
+
+    try {
+      const results = (await searchCity(query)) || [];
+
+      searchResults.innerHTML = results
+        .map(
+          (city) => `
+            <div class="search-result" data-city="${city.name}">
+              <h3 class="search-result__name">${city.name}</h3> 
+              <p class="search-result__country">${city.country}</p>
+            </div>`,
+        )
+        .join("");
+    } catch (error) {
+      console.error("Fehler bei der Suche", error);
+    }
+  }, 300);
+
+  searchInput.addEventListener("input", (e) => {
+    handleSearch(e.target.value);
+  });
+
+  searchResults.addEventListener("click", (e) => {
+    const result = e.target.closest(".search-result");
+    if (!result) return;
+    const city = result.dataset.city;
+
+    searchResults.innerHTML = "";
+    searchInput.value = "";
+    renderDetailView(city);
+  });
 
   editButton.addEventListener("click", () => {
     isEditMode = !isEditMode;
