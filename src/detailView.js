@@ -5,6 +5,7 @@ import { getDaysForecast } from "./daysForecast";
 import { getMiniStats } from "./miniStats";
 import { getConditionImagePath } from "./conditions";
 import { renderMainMenu } from "./mainMenu";
+import { getSavedCities, saveCities } from "./utils";
 
 const backIcon = `
 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
@@ -24,15 +25,15 @@ export async function renderDetailView(city) {
   app.innerHTML = "";
   app.classList.remove("show-background");
 
-  showLoadingSpinner(app, `Lade Wetterdaten für ${city}...`);
+  showLoadingSpinner(app, `Lade Wetterdaten für ${city.query}...`);
 
   try {
-    const weather = await getWeatherData(city);
+    const weather = await getWeatherData(city.id);
 
     hideLoadingSpinner(app);
 
-    const savedCities = JSON.parse(localStorage.getItem("cities")) || [];
-    const isSaved = savedCities.includes(weather.city);
+    const savedCities = getSavedCities();
+    const isSaved = savedCities.includes(city.id);
 
     app.innerHTML = `
        <div class="action-bar">
@@ -78,15 +79,15 @@ export async function renderDetailView(city) {
 
     if (favoriteButton) {
       favoriteButton.addEventListener("click", () => {
-        const savedCities = JSON.parse(localStorage.getItem("cities")) || [];
+        const savedCities = getSavedCities();
 
-        /*   if (savedCities.includes(weather.city)) {
+        if (savedCities.includes(city.id)) {
           alert(`${weather.city} wurde bereits den Favoriten hinzugefügt!`);
           return;
-        } */
+        }
 
-        savedCities.push(weather.city);
-        localStorage.setItem("cities", JSON.stringify(savedCities));
+        savedCities.push(city.id);
+        saveCities(savedCities);
 
         alert(`${weather.city} wurde zu den Favoriten hinzugefügt!`);
 

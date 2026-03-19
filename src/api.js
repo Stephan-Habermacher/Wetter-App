@@ -3,9 +3,10 @@ import { formatTime } from "./utils";
 const API_KEY = import.meta.env.VITE_WEATHER_API_KEY;
 const API_ENDPOINT = "https://api.weatherapi.com/v1";
 
+// Daten-Request (Forecast, etc.)
 export async function getWeatherData(city) {
   const res = await fetch(
-    `${API_ENDPOINT}/forecast.json?key=${API_KEY}&q=${city}&days=3&lang=de`,
+    `${API_ENDPOINT}/forecast.json?key=${API_KEY}&q=id:${city}&days=3&lang=de`,
   );
 
   if (!res.ok) {
@@ -13,7 +14,6 @@ export async function getWeatherData(city) {
   }
 
   const data = await res.json();
-  console.log(data);
 
   // Stundenvorhersage für die nächsten 24 Stunden
   const today = data.forecast.forecastday[0];
@@ -50,6 +50,7 @@ export async function getWeatherData(city) {
   });
 
   return {
+    id: data.location.id,
     city: data.location.name,
     country: data.location.country,
 
@@ -76,6 +77,7 @@ export async function getWeatherData(city) {
   };
 }
 
+// Search-Request
 export async function searchCity(city) {
   const res = await fetch(
     `${API_ENDPOINT}/search.json?key=${API_KEY}&q=${city}&lang=de`,

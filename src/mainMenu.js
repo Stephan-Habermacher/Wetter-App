@@ -2,8 +2,10 @@ import { getWeatherData, searchCity } from "./api";
 import { getConditionImagePath } from "./conditions";
 import { renderDetailView } from "./detailView";
 import { hideLoadingSpinner, showLoadingSpinner } from "./loadingSpinner";
+import { getSavedCities, saveCities } from "./utils";
 
 let isEditMode = false;
+let lastResults = [];
 
 const deleteIcon = `
 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
@@ -11,7 +13,8 @@ const deleteIcon = `
 </svg>
 `;
 
-function debounce(callback, delay = 300) {
+// Debounce Funktion
+function debounce(callback, delay = 500) {
   let timeout;
 
   return (...args) => {
@@ -23,13 +26,17 @@ function debounce(callback, delay = 300) {
   };
 }
 
+// Hauptansicht rendern
 export async function renderMainMenu() {
   const app = document.getElementById("app");
 
   app.classList.remove("show-background");
+
   app.innerHTML = "";
 
-  const cities = JSON.parse(localStorage.getItem("cities")) || [];
+  showLoadingSpinner(app, "Lade Übersicht...");
+
+  const savedCityIds = getSavedCities();
 
   app.innerHTML = `
     <div class="main-menu">
@@ -52,53 +59,88 @@ export async function renderMainMenu() {
   </div>
   `;
 
-  showLoadingSpinner(app, "Lade Übersicht...");
-
   const citiesList = app.querySelector(".main-menu__cities-list");
   const message = app.querySelector(".main-menu__message");
   const editButton = app.querySelector(".main-menu__edit");
   const searchInput = app.querySelector(".main-menu__search-input");
   const searchResults = app.querySelector(".main-menu__search-results");
 
+  // Suchresultate rendern
+  function renderSearchResults(results) {
+    if (results.length === 0) {
+      searchResults.innerHTML = `<div class="search-result">Keine Städte gefunden</div>`;
+      return;
+    }
+
+    searchResults.innerHTML = results
+      .map(
+        (city) => `
+            <div class="search-result" data-city-name="${city.name}" data-city-id="${city.id}">
+              <h3 class="search-result__name">${city.name}</h3> 
+              <p class="search-result__country">${city.country}</p>
+            </div>`,
+      )
+      .join("");
+  }
+
+  // API-Suche
   const handleSearch = debounce(async (value) => {
     const query = value.trim();
 
     if (query.length < 2) {
       searchResults.innerHTML = "";
+      lastResults = [];
       return;
     }
+
+    searchResults.innerHTML = `<div class="search-result">Lade Vorschläge...</div>`;
 
     try {
       const results = (await searchCity(query)) || [];
 
-      searchResults.innerHTML = results
-        .map(
-          (city) => `
-            <div class="search-result" data-city="${city.name}">
-              <h3 class="search-result__name">${city.name}</h3> 
-              <p class="search-result__country">${city.country}</p>
-            </div>`,
-        )
-        .join("");
+      lastResults = results;
+
+      renderSearchResults(results);
     } catch (error) {
       console.error("Fehler bei der Suche", error);
     }
-  }, 300);
+  }, 500);
 
   searchInput.addEventListener("input", (e) => {
     handleSearch(e.target.value);
   });
 
+  // Erneuter Klick auf die Searchbar bringt die Vorschläge mit bestehendem String zurück
+  searchInput.addEventListener("focusin", () => {
+    if (searchInput.value.trim() && lastResults.length > 0) {
+      renderSearchResults(lastResults);
+    }
+  });
+
+  // Klick ausserhalb der Searchbar, lässt die Vorschläge verschwinden (String bleibt bestehen)
+  document.addEventListener("click", (e) => {
+    const isClickInside = e.target.closest(".main-menu__search-bar");
+
+    if (!isClickInside) {
+      searchResults.innerHTML = "";
+    }
+  });
+
+  // Klick auf das Suchresultat löst Detailansicht der gewählten Stadt aus
   searchResults.addEventListener("click", (e) => {
     const result = e.target.closest(".search-result");
     if (!result) return;
-    const city = result.dataset.city;
+
+    const cityId = result.dataset.cityId;
+    const cityName = result.dataset.cityName;
 
     searchResults.innerHTML = "";
     searchInput.value = "";
-    renderDetailView(city);
+
+    renderDetailView({ id: cityId, query: cityName });
   });
 
+  // Toggle für "Bearbeiten"/"Fertig"
   editButton.addEventListener("click", () => {
     isEditMode = !isEditMode;
     editButton.textContent = isEditMode ? "Fertig" : "Bearbeiten";
@@ -110,25 +152,26 @@ export async function renderMainMenu() {
     });
   });
 
-  if (cities.length === 0) {
+  if (savedCityIds.length === 0) {
     message.textContent = "Noch keine Favoriten gespeichert.";
     hideLoadingSpinner(app);
     return;
   }
 
-  for (const city of cities) {
+  for (const cityId of savedCityIds) {
     try {
-      const weather = await getWeatherData(city);
-      const cityCard = createCityCard(weather);
+      const weather = await getWeatherData(cityId);
+      const cityCard = createCityCard({ ...weather, id: cityId });
       citiesList.appendChild(cityCard);
     } catch (error) {
-      console.error(`Fehler beim Laden von ${city}:`, error);
+      console.error(`Fehler beim Laden von ${cityId}:`, error);
     }
   }
 
   hideLoadingSpinner(app);
 }
 
+// Kreiert für jede gespeicherte Stadt die entsprechende Karte in der Hauptansicht
 function createCityCard(weather) {
   const wrapper = document.createElement("div");
   wrapper.className = "city-wrapper";
@@ -139,7 +182,7 @@ function createCityCard(weather) {
   );
 
   wrapper.innerHTML = `
-    <div class="city-wrapper__delete" data-city-name="${weather.city}">${deleteIcon}</div>
+    <div class="city-wrapper__delete" data-city-id="${weather.id}">${deleteIcon}</div>
 
     <div class="city" style="--condition-image: url(${conditionImage})">
       <div class="city__left-column">
@@ -160,23 +203,22 @@ function createCityCard(weather) {
   const cityElement = wrapper.querySelector(".city");
   const deleteButton = wrapper.querySelector(".city-wrapper__delete");
 
+  // Klick auf die Favoritenkarte öffnet die Detailansicht der jeweiligen Stadt
   cityElement.addEventListener("click", () => {
     if (!isEditMode) {
-      renderDetailView(weather.city);
+      renderDetailView({ id: weather.id });
     }
   });
 
   deleteButton.addEventListener("click", (e) => {
     e.stopPropagation();
 
-    const cityName = deleteButton.dataset.cityName;
-    const cities = JSON.parse(localStorage.getItem("cities")) || [];
+    const cityId = deleteButton.dataset.cityId;
 
-    const updatedCities = cities.filter((c) => c !== cityName);
+    const updatedCityIds = getSavedCities().filter((id) => id !== cityId);
+    saveCities(updatedCityIds);
 
-    localStorage.setItem("cities", JSON.stringify(updatedCities));
-
-    if (updatedCities.length === 0) {
+    if (updatedCityIds.length === 0) {
       renderMainMenu();
       return;
     }

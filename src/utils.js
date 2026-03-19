@@ -15,3 +15,11 @@ export function formatTime(timeString) {
 
   return `${String(hours).padStart(2, "0")}:${minutes} Uhr`;
 }
+
+export function getSavedCities() {
+  return JSON.parse(localStorage.getItem("cities")) || [];
+}
+
+export function saveCities(cities) {
+  localStorage.setItem("cities", JSON.stringify(cities));
+}
